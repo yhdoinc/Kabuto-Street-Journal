@@ -108,7 +108,7 @@ export default function Home() {
   return (
     <div style={{ width: '100%', backgroundColor: 'white', minHeight: '100vh', color: 'black' }}>
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-        <Header lastUpdated={lastUpdated} />
+<Header {...({ lastUpdated } as any)} />
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 3fr 1.2fr', 
