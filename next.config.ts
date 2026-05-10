@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Vercelでのデプロイを最適化し、パスの迷子を防ぎます
+  output: 'standalone', 
   typescript: {
-    // TypeScriptの型チェックをスキップ（沈黙の原因を排除）
     ignoreBuildErrors: true,
   },
   eslint: {
-    // ESLintのチェックもスキップ
     ignoreDuringBuilds: true,
   },
 };
