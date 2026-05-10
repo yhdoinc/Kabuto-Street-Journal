@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function Header() {
+// 修正ポイント：{ lastUpdated }: any を追加して、外からのデータを受け取れるようにします
+export default function Header({ lastUpdated }: any) {
   // 1. 変数名を data, setData で統一します
   const [data, setData] = useState({
     totalAssets: "Connecting...",
@@ -12,8 +13,6 @@ export default function Header() {
   });
 
   const futuraStyle = { fontFamily: '"futura-pt", sans-serif' };
-
- 
 
   return (
     <header style={{ width: '100%', paddingTop: '40px', paddingBottom: '10px', borderBottom: '1px solid black' }}>
@@ -26,7 +25,10 @@ export default function Header() {
           What's News.
         </div>
         <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
-          
+          {/* ここに更新時間を表示する場所を作ります */}
+          <span style={{ ...futuraStyle, fontSize: '10px', color: '#666' }}>
+            LAST UPDATED: {lastUpdated}
+          </span>
         </div>
       </div>
 
@@ -41,7 +43,6 @@ export default function Header() {
       {/* 日付と開始日 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', ...futuraStyle, fontSize: '11px', fontWeight: 900 }}>
         <span>Sunday, March 1, 2026</span>
-        {/* GASから取得した開始日を表示！ */}
         <span>ESTABLISHED {data.startDate}</span>
       </div>
     </header>
