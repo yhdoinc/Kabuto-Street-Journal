@@ -1,0 +1,16 @@
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* もし下に grid に関する自作CSSがあれば、それが邪魔している可能性があります */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  /* 余計な flex や center をここから排除します */
+}
