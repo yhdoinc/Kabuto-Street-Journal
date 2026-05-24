@@ -4,6 +4,7 @@ import Header from './components/Header';
 import MarketWatch from './components/MarketWatch';
 import AiReport from './components/AiReport';
 import AssetStatus from './components/AssetStatus';
+import EarningsSchedule from './components/EarningsSchedule';
 
 // --- 道具箱から格言をインポート ---
 import { RAW_QUOTES } from "@/utils/quotes"; 
@@ -119,6 +120,9 @@ export default function Home() {
         }}>
           <MarketWatch market={data.market} lastUpdated={lastUpdated} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+            {/* 上段：決算スケジュール（即時表示で視線をホールド） */}
+            <EarningsSchedule />
+            {/* 下段：AIレポート*/}
             <AiReport content={report} />
           </div>
           <AssetStatus data={data} />
