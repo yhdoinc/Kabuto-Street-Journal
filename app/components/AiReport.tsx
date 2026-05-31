@@ -14,18 +14,15 @@ export default function AiReport({ content }: { content: string }) {
       lineHeight: '1.6',
     }}>
       {/* タイトルセクション */}
-      <h2 style={{
+      <h2 style={{borderBottom:'2px solid black',fontStyle: 'italic',
   fontFamily: 'futura-pt, sans-serif',
-        fontSize: '1.6rem',
+        fontSize: '2rem',
         fontWeight: 'bold',
-        letterSpacing: '0.1em',
-        margin: '0 0 16px 0',
         color: '#111',
-        paddingBottom: '2em',
-        textAlign: 'center'
+        textAlign: 'left'
       }}>
-        LATEST <span style={{ 
-    fontSize: '2.8rem', 
+       <span style={{ 
+    fontSize: '2.4rem', 
   }}>AI</span> MARKET REPORT
       </h2>
       {/* 格言エリア */}
@@ -33,6 +30,7 @@ export default function AiReport({ content }: { content: string }) {
         fontWeight: 'bold', 
         fontStyle: 'italic', 
         fontSize: '1.15em',
+        marginTop: '100px',
         marginBottom: '24px',
         color: '#222'
       }}>

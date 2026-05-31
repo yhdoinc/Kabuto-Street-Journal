@@ -9,6 +9,7 @@ interface Stock {
   time: string;
   isWatch: boolean;
   week: string;
+  market: string;
 }
 
 export default function EarningsSchedule() {
@@ -17,63 +18,65 @@ export default function EarningsSchedule() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // あなたのGASウェブアプリのデプロイURL
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxImPyHW1XVDnSGJK6JZzATyCs-n8ZCPYV6VUjbL46aeokt9sxT_BwaF_E9wpkx8Whg0Q/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxleBmiGw3BcL3UW_jxi5lPCve5TmPtbNrK9j8vUZAgDiHVrHA0RvhDB-6sGHw6AacZsA/exec';
     
-    console.log("🚀 巡回マシーンへの通信を開始します...");
+    console.log("🚀 決算カレンダーシステム、通信開始...");
 
     fetch(GAS_URL, { method: 'GET' })
       .then(res => {
         if (!res.ok) throw new Error('Network response was not ok');
-        return res.text();
+        return res.json();
       })
-      .then(text => {
-        const rawData = JSON.parse(text);
+      .then(rawData => {
         console.log("🎯 GASから届いた生のデータ構造:", rawData);
         
         if (Array.isArray(rawData)) {
-          // 💡 【最強ハック】日本語の特殊なヘッダー名を完全に名寄せして、型安全なアセットに変換
           const cleanedData = rawData.map((item: any) => {
-            let date = "5/18 (月)"; // 今週のカレンダーに確実に点灯させるデフォルト値
+            let date = "日付未定"; 
             let code = "----";
             let name = "不明な銘柄";
-            let time = "15:00";
+            let time = "15:00"; 
             let isWatch = false;
             let week = "this";
+            let market = "JP";
 
             Object.keys(item).forEach(key => {
-              // キー名に含まれる文字列から属性を100%見抜く
-              if (key.includes('code') || key.includes('コード')) {
-                code = String(item[key]);
+              const lowerKey = key.toLowerCase();
+              if (lowerKey.includes('code') || lowerKey.includes('コード')) code = String(item[key]);
+              if (lowerKey.includes('備考') || lowerKey.includes('name') || lowerKey.includes('銘柄名')) name = String(item[key]);
+              if (lowerKey.includes('market') || lowerKey.includes('市場')) {
+                market = String(item[key]).toUpperCase();
+                if (market === 'US') time = "取引時間後";
               }
-              if (key.includes('備考') || key.includes('name') || key.includes('銘柄名')) {
-                name = String(item[key]);
-              }
-              if (key.includes('market') || key.includes('市場')) {
-                if (String(item[key]) === 'US') time = "取引時間後";
-              }
-              if (key.includes('isWatch') || key.includes('Watch') || key.includes('監視')) {
+              if (lowerKey.includes('iswatch') || lowerKey.includes('watch') || lowerKey.includes('監視')) {
                 isWatch = item[key] === true || String(item[key]).toUpperCase() === 'TRUE';
               }
-              if (key.includes('date') || key.includes('日付')) {
-                date = String(item[key]);
+              if (lowerKey.includes('date') || lowerKey.includes('日付') || lowerKey.includes('決算日') || lowerKey.includes('予定')) {
+                if (item[key]) date = String(item[key]);
               }
-              if (key.includes('week') || key.includes('週')) {
-                week = String(item[key]);
+              if (lowerKey.includes('week') || lowerKey.includes('週')) {
+                if (item[key]) week = String(item[key]).toLowerCase();
               }
             });
 
-            // ⚡️あなたのガチ保有株・最重要監視銘柄の決算スケジュール演出（点灯テスト用）
-            if (code === "8058") { date = "5/18 (月)"; time = "15:30"; }
-            if (code === "8306") { date = "5/18 (月)"; time = "16:00"; }
-            if (code === "NVDA") { date = "5/20 (Wednesday)"; time = "取引時間後"; }
-            if (code === "RKLB") { date = "5/19 (Tuesday)"; time = "取引時間後"; }
-            if (code === "TSM")  { date = "5/21 (Thursday)"; time = "取引時間前"; }
-
-            return { date, code, name, time, isWatch, week };
+            return { date, code, name, time, isWatch, week, market };
           });
 
-          console.log("✨ 日本語名寄せ完了後のデータ:", cleanedData);
+          // 📊 【追加：冷徹な日付順ソートロジック】
+          // 5/20 などの文字列を一時的に2026年のシリアル値に直して昇順ソートをかけます
+          cleanedData.sort((a, b) => {
+            const parseDate = (dStr: string) => {
+              const parts = dStr.split('/');
+              if (parts.length === 2) {
+                // 2026年固定でミリ秒に変換
+                return new Date(2026, parseInt(parts[0], 10) - 1, parseInt(parts[1], 10)).getTime();
+              }
+              return Infinity; // 日付未定やバグデータは強制的に最下位へ追放
+            };
+            return parseDate(a.date) - parseDate(b.date);
+          });
+
+          console.log("✨ カレンダー同期・日付ソート完了後のデータ:", cleanedData);
           setStocks(cleanedData);
         }
         setLoading(false); 
@@ -84,7 +87,6 @@ export default function EarningsSchedule() {
       });
   }, []);
 
-  // タブ切り替えフィルタリング（仕分けが漏れてもセーフティネットで今週側に全弾叩き込む）
   const getFilteredStocks = () => {
     return stocks.filter(stock => {
       if (activeTab === 'thisWeek') {
@@ -107,27 +109,23 @@ export default function EarningsSchedule() {
 
   return (
     <div style={{ width: '100%', fontFamily: 'monospace', color: '#000' }}>
-      {/* タイトルセクション */}
-      <h2 style={{ fontSize: '1.4rem', fontWeight: '900', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '15px', borderLeft: '5px solid #000', paddingLeft: '10px' }}>
-        KABUTO STREET JOURNAL - EARNINGS CALENDAR
+      <h2 style={{
+        borderBottom:'2px solid black', fontStyle: 'italic', marginTop:'0em',
+        fontFamily: 'futura-pt, sans-serif', fontSize: '2rem', fontWeight: 'bold', color: '#111'
+      }}>
+        EARNINGS CALENDAR
       </h2>
 
-      {/* KSJ ソリッドモノクロタブ */}
       <div style={{ display: 'flex', borderBottom: '2px solid #000', marginBottom: '20px' }}>
         {(['thisWeek', 'nextWeek'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
-              flex: 1,
-              padding: '10px 16px',
-              cursor: 'pointer',
+              flex: 1, padding: '10px 16px', cursor: 'pointer',
               backgroundColor: activeTab === tab ? '#000' : '#f1f1f1',
               color: activeTab === tab ? '#fff' : '#000',
-              border: 'none',
-              fontWeight: 'bold',
-              fontSize: '0.85rem',
-              letterSpacing: '0.05em',
+              border: 'none', fontWeight: 'bold', fontSize: '0.85rem', letterSpacing: '0.05em',
               transition: 'all 0.2s ease'
             }}
           >
@@ -137,7 +135,6 @@ export default function EarningsSchedule() {
         ))}
       </div>
 
-      {/* スケジュールリスト本体 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {getFilteredStocks().length === 0 ? (
           <div style={{ padding: '20px', color: '#666', fontStyle: 'italic', textAlign: 'center', border: '2px dashed #000', backgroundColor: '#fafafa' }}>
@@ -148,23 +145,23 @@ export default function EarningsSchedule() {
             <div 
               key={index} 
               style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                padding: '10px 12px', 
-                border: stock.isWatch ? '1.5px solid #000' : '1px solid #ccc',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '6px 8px', 
+                border: stock.isWatch ? '1.2px solid #000' : '1px dashed #ccc',
                 backgroundColor: '#fff',
                 boxShadow: stock.isWatch ? '1px 1px 0px #000' : 'none',
-                transform: stock.isWatch ? 'translate(-2px, -2px)' : 'none',
                 transition: 'all 0.1s ease'
               }}
             >
-              {/* 左側：スケジュール・コード・銘柄名 */}
               <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 'bold', minWidth: '30px' }}>
+                <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 'bold', minWidth: '60px' }}>
                   {stock.date}
                 </span>
-                <span style={{ fontSize: '0.7rem', color: '#000', fontWeight: '900', backgroundColor: '#e8e8e8', padding: '2px 6px', borderRadius: '2px', fontFamily: 'Courier New, monospace' }}>
+                <span style={{ 
+                  fontSize: '0.7rem', color: '#000', fontWeight: '900', 
+                  backgroundColor: stock.market === 'US' ? '#fee2e2' : '#e8e8e8', 
+                  padding: '2px 6px', borderRadius: '2px', fontFamily: 'Courier New, monospace' 
+                }}>
                   {stock.code}
                 </span>
                 <span style={{ fontWeight: stock.isWatch ? '900' : '500', fontSize: '0.75rem', color: '#000' }}>
@@ -172,7 +169,6 @@ export default function EarningsSchedule() {
                 </span>
               </div>
               
-              {/* 右側：発表時間・FOCUSバッジ */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '0.6rem', border: '1px solid #000', padding: '3px 8px', fontWeight: 'bold', backgroundColor: '#fff' }}>
                   {stock.time}

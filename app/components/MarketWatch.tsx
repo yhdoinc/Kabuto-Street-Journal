@@ -11,9 +11,9 @@ export default function MarketWatch({ market, lastUpdated }: { market: any[], la
         borderBottom: '2px solid black', 
         marginBottom: '15px' 
       }}>
-        <h3 style={{ ...futuraStyle, fontWeight: 900, fontSize: '18px', fontStyle: 'italic', margin: 0 }}>
+        <h2 style={{ ...futuraStyle, fontWeight: 900, fontSize: '18px', fontStyle: 'italic', margin: 0 }}>
           MARKET WATCH
-        </h3>
+        </h2>
         <span style={{ ...futuraStyle, fontSize: '9px', color: '#999' }}>{lastUpdated}</span>
       </div>
 

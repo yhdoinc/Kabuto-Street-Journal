@@ -115,7 +115,7 @@ export default function Home() {
           gridTemplateColumns: '1fr 3fr 1.2fr', 
           gap: '30px',
           borderTop: '2px solid black',
-          paddingTop: '20px',
+          paddingTop: '60px',
           marginTop: '20px'
         }}>
           <MarketWatch market={data.market} lastUpdated={lastUpdated} />

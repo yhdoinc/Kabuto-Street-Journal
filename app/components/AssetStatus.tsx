@@ -3,6 +3,7 @@ const futuraStyle = { fontFamily: '"futura-pt", sans-serif' };
 export default function AssetStatus({ data }: { data: any }) {
   return (
     <div>
+       <h2 style={{ ...futuraStyle, fontWeight: 900, fontSize: '18px', fontStyle: 'italic', borderBottom:'2px solid black'}}>INVESTMENT PERFORMANCE</h2>
       <div style={{ backgroundColor: '#f9f9f9', padding: '20px', border: '1px solid #eee', marginBottom: '20px' }}>
         <h3 style={{ fontSize: '14px', textAlign: 'center', marginBottom: '15px', fontWeight: 900, borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>ダブルインバース坂ノボルの<br />運用成績</h3>
         <div style={{ textAlign: 'center', marginBottom: '15px' }}>
@@ -20,8 +21,8 @@ export default function AssetStatus({ data }: { data: any }) {
           </span>
         </div>
       </div>
-      <div style={{ borderTop: '2px solid black', paddingTop: '15px' }}>
-        <h3 style={{ ...futuraStyle, fontSize: '12px', fontWeight: 900, marginBottom: '10px' }}>SOCIAL MEDIA</h3>
+      <div style={{ paddingTop: '25px'}}>
+        <h2 style={{ ...futuraStyle, fontWeight: 900, fontSize: '18px', fontStyle: 'italic', borderBottom:'2px solid black'}}>SOCIAL MEDIA</h2>
         <div style={{ padding: '15px', border: '1px solid #ccc', textAlign: 'center' }}>
           <a href="https://x.com/cabaffett1106" target="_blank" rel="noopener noreferrer" style={{ display: 'block', backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '11px', fontWeight: 900, textDecoration: 'none' }}>X　ダブルインバース坂ノボル</a>
         </div>
